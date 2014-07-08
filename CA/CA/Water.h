@@ -20,4 +20,7 @@ public :
 
 private :
 	int power;
+
+	int water_dt;
+	int water_stay;
 };

@@ -15,6 +15,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		Rect rc;
 		::GetClientRect(hWnd,&rc);
 
+		// Character Input ////////
+
 		Character* pCharacter = new Character;
 		pCharacter->SetPosition(Point(rc.width()/4, rc.center().y));
 		pCharacter->SetKeyMapping(VK_LCONTROL, VK_LSHIFT, 'W','S','A','D');
@@ -22,7 +24,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		ObjectDepot.push(pCharacter);
 
-		///////////////////////
+		////////////////////////////
 
 		pCharacter = new Character;
 		pCharacter->SetPosition(Point(rc.width()*3/4, rc.center().y));
@@ -31,7 +33,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		ObjectDepot.push(pCharacter);
 		
-		///////////////////////
+		/////////////////////////////
 
 		st = ::GetTickCount();
 		::SetTimer(hWnd, 0, 10, NULL);

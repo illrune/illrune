@@ -215,6 +215,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Collision.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Collision.h"
+				>
+			</File>
+			<File
 				RelativePath=".\DoubleBuffer.cpp"
 				>
 			</File>

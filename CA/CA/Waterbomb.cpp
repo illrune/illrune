@@ -38,7 +38,7 @@ void Waterbomb::Update(DWORD tick)
 }
 void Waterbomb::Draw(HDC hdc)
 {
-	HBRUSH hBrush = ::CreateSolidBrush(RGB(0,0,255));
+	HBRUSH hBrush = ::CreateSolidBrush(RGB(0,200,255));
 	HBRUSH hOldBrush = ::Select(hdc,hBrush);
 
 	::Ellipse(hdc, pos().x - rolling, pos().y - rolling,

@@ -4,6 +4,7 @@
 #include "GameDev.h"
 #include "Object.h"
 #include "Waterbomb.h"
+#include "Collision.h"
 
 class Character : public Object
 {

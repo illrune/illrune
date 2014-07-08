@@ -84,13 +84,12 @@ void Character::Draw(HDC hdc)
 
 bool Character::IsCollide(Object* obj)
 {
-   if (obj->type() == OBJ_ITEM_SPEED)
+   if (obj->type() == OBJ_WATER)
    {
-      //Bullet* pBullet = dynamic_cast<Bullet*>(obj);
-      //Point pt = pBullet->GetPosition();
-      //LONG r = pBullet->GetRadius();
+      //Water* pWater = dynamic_cast<Water*>(obj);
+      //Point pt = pWater->GetPosition();
 
-      //return Collision(pos(), radius, pt, r);
+      return Collision(pos(), size, pt);
    }
    //else if (obj->type() == OBJ_BLOCK)
    //{
@@ -101,6 +100,7 @@ bool Character::IsCollide(Object* obj)
 }
 void Character::DoBreak()
 {
+	SetNeedToClean();
 }
 void Character::SetClientRect(Rect& rc)
 {
