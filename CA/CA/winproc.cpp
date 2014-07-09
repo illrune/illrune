@@ -19,7 +19,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		Character* pCharacter = new Character;
 		pCharacter->SetPosition(Point(rc.width()/4, rc.center().y));
-		pCharacter->SetKeyMapping(VK_LCONTROL, VK_LSHIFT, 'W','S','A','D');
+		pCharacter->SetKeyMapping(VK_LCONTROL, VK_LSHIFT, 'R','F','D','G');
 		pCharacter->SetClientRect(rc);
 
 		ObjectDepot.push(pCharacter);
@@ -28,7 +28,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		pCharacter = new Character;
 		pCharacter->SetPosition(Point(rc.width()*3/4, rc.center().y));
-		pCharacter->SetKeyMapping(VK_RCONTROL, VK_RSHIFT, VK_UP, VK_DOWN, VK_LEFT, VK_RIGHT);
+		pCharacter->SetKeyMapping('O', 'P', VK_UP, VK_DOWN, VK_LEFT, VK_RIGHT);
 		pCharacter->SetClientRect(rc);
 
 		ObjectDepot.push(pCharacter);

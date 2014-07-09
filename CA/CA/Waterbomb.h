@@ -20,6 +20,8 @@ public :
    virtual void DoBreak();
 
 private :
+	int power;
+
 	int rolling;
 	bool roll;
 	int rollcount;

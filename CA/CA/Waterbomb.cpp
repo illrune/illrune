@@ -1,7 +1,8 @@
 #include "Waterbomb.h"
 
 Waterbomb::Waterbomb()
-: Object(OBJ_WATERBOMB, true), rolling(20), roll(true), rollcount(0)
+: Object(OBJ_WATERBOMB, true), power(1)
+, rolling(20), roll(true), rollcount(0)
 , roll_dt(0), roll_delay(30)
 {
 }
@@ -61,6 +62,26 @@ void Waterbomb::DoBreak()
 	pWater->SetObjectPosition(pos());
 
 	ObjectDepot.push(pWater);
+
+	for (int i = 0; i < power; i++)
+	{
+		// UP
+		pWater = new Water;
+		pWater->SetObjectPosition(pos() + Point(0,-(40*(i+1))));
+		ObjectDepot.push(pWater);
+		// DOWN
+		pWater = new Water;
+		pWater->SetObjectPosition(pos() + Point(0,40*(i+1)));
+		ObjectDepot.push(pWater);
+		// LEFT
+		pWater = new Water;
+		pWater->SetObjectPosition(pos() + Point(-(40*(i+1)),0));
+		ObjectDepot.push(pWater);
+		// RIGHT
+		pWater = new Water;
+		pWater->SetObjectPosition(pos() + Point(40*(i+1),0));
+		ObjectDepot.push(pWater);
+	}
 
 	SetNeedToClean();
 }

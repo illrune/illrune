@@ -33,7 +33,15 @@ public :
 	void PowerUp();
 
 private :
+	DWORD st;
+	DWORD dt;
+	int lock_dt;
+	int lock_delay;
+
+	COLORREF color;
+	int colorvalue;
 	int size;
+	bool locked;
 
 	Rect clientrc;
 	int bomb_dt;

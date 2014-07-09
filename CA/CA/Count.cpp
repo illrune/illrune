@@ -13,8 +13,16 @@ void Count::Input(DWORD)
 void Count::Update(DWORD)
 {
 }
-void Count::Draw(HDC)
+void Count::Draw(HDC hdc)
 {
+	HBRUSH hBrush = ::CreateSolidBrush(RGB(0,0,200));
+	HBRUSH hOldBrush = ::Select(hdc,hBrush);
+
+	::Ellipse(hdc, pos().x - 15, pos().y - 15,
+		pos().x + 15, pos().y + 15);
+
+	::Select(hdc,hOldBrush);
+	::DeleteObject(hBrush);
 }
 
 bool Count::IsCollide(Object* obj)

@@ -1,7 +1,9 @@
 #include "Character.h"
 
 Character::Character()
-: size(20)
+: lock_dt(0), lock_delay(100)
+, st(0), dt(0)
+, color(RGB(255,255,255)), colorvalue(0), size(20), locked(false)
 , bomb_dt(0), bomb_delay(200)
 , key_allocate(VK_SPACE), key_item_use(VK_LCONTROL)
 , key_up(VK_UP), key_down(VK_DOWN), key_left(VK_LEFT), key_right(VK_RIGHT)
@@ -9,6 +11,7 @@ Character::Character()
 , direction(0.f,0.f)
 , speed(2.f), count(1), power(1)
 {
+	st = ::GetTickCount();
 }
 Character::~Character()
 {
@@ -16,7 +19,15 @@ Character::~Character()
 
 void Character::Input(DWORD tick)
 {
-	// allocate, item_use
+
+	// item_use
+	if ((::GetAsyncKeyState(key_item_use) & 0x8000) == 0x8000)
+	{
+		lock_dt = 0;
+		colorvalue = 0;
+		locked = false;
+	}
+	// allocate
 	if ((::GetAsyncKeyState(key_allocate) & 0x8000) == 0x8000)
 	{
 		if (bomb_dt >= bomb_delay)
@@ -30,9 +41,6 @@ void Character::Input(DWORD tick)
 			bomb_dt = 0;
 		}
 		bomb_dt += tick;
-	}
-	if ((::GetAsyncKeyState(key_item_use) & 0x8000) == 0x8000)
-	{
 	}
 
 	// Move
@@ -75,11 +83,33 @@ void Character::Input(DWORD tick)
 }
 void Character::Update(DWORD)
 {
+	color = RGB(255-colorvalue, 255-colorvalue, 255-colorvalue);
+	dt = ::GetTickCount() - st;
+	st = ::GetTickCount();
+
+	if(locked)
+	{
+		if (lock_dt >= lock_delay)
+		{
+			colorvalue++;
+
+			if(colorvalue >= 255)
+				SetNeedToClean();
+		}
+
+		lock_dt += dt;
+	}
 }
 void Character::Draw(HDC hdc)
 {
+	HBRUSH hBrush = ::CreateSolidBrush(color);
+	HBRUSH hOldBrush = ::Select(hdc,hBrush);
+
 	::Ellipse(hdc, pos().x - size, pos().y - size,
 		pos().x + size, pos().y + size);
+
+	::Select(hdc,hOldBrush);
+	::DeleteObject(hBrush);
 }
 
 bool Character::IsCollide(Object* obj)
@@ -88,8 +118,10 @@ bool Character::IsCollide(Object* obj)
    {
       //Water* pWater = dynamic_cast<Water*>(obj);
       //Point pt = pWater->GetPosition();
-
-      return Collision(pos(), size, pt);
+		
+	   Point pt = obj->GetPosition();
+	   
+	   return Collision(pos(), size, pt);
    }
    //else if (obj->type() == OBJ_BLOCK)
    //{
@@ -100,7 +132,7 @@ bool Character::IsCollide(Object* obj)
 }
 void Character::DoBreak()
 {
-	SetNeedToClean();
+	locked = true;
 }
 void Character::SetClientRect(Rect& rc)
 {

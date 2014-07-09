@@ -35,9 +35,9 @@ void ObjectManager::Update(DWORD tick)
          if ((*it)->IsCollide(*jt))
          {
             if ((*it)->IsBreakable())
-               (*it)->DoBreak();
-            if ((*jt)->IsBreakable())
-               (*jt)->DoBreak();
+				(*it)->DoBreak();
+			if ((*jt)->IsBreakable())
+				(*jt)->DoBreak();
          }
       }
    }

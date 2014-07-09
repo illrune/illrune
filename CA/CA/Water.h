@@ -19,8 +19,6 @@ public :
    virtual void DoBreak();
 
 private :
-	int power;
-
 	int water_dt;
 	int water_stay;
 };
