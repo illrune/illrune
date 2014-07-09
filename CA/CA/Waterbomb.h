@@ -15,6 +15,8 @@ public :
    virtual void Update(DWORD);
    virtual void Draw(HDC);
 
+   void SetPower(int WPower);
+
    virtual bool IsCollide(Object* );
 
    virtual void DoBreak();

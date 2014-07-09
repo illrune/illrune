@@ -1,7 +1,7 @@
 #include "Character.h"
 
 Character::Character()
-: lock_dt(0), lock_delay(100)
+: lock_dt(0), lock_delay(1000)
 , st(0), dt(0)
 , color(RGB(255,255,255)), colorvalue(0), size(20), locked(false)
 , bomb_dt(0), bomb_delay(200)
@@ -9,7 +9,7 @@ Character::Character()
 , key_up(VK_UP), key_down(VK_DOWN), key_left(VK_LEFT), key_right(VK_RIGHT)
 , Object(OBJ_CHARACTER, true)
 , direction(0.f,0.f)
-, speed(2.f), count(1), power(1)
+, speed(2.f), count(1), power(2), nowcount(0)
 {
 	st = ::GetTickCount();
 }
@@ -27,54 +27,63 @@ void Character::Input(DWORD tick)
 		colorvalue = 0;
 		locked = false;
 	}
-	// allocate
-	if ((::GetAsyncKeyState(key_allocate) & 0x8000) == 0x8000)
+	if (!locked)
 	{
-		if (bomb_dt >= bomb_delay)
+		// allocate
+		if ((::GetAsyncKeyState(key_allocate) & 0x8000) == 0x8000)
 		{
-			Waterbomb* pWaterbomb= new Waterbomb;
+			if(nowcount <= count)
+			{
+				if (bomb_dt >= bomb_delay)
+				{
+					Waterbomb* pWaterbomb= new Waterbomb;
 
-			pWaterbomb->SetObjectPosition(pos());
+					pWaterbomb->SetObjectPosition(pos());
+					pWaterbomb->SetPower(power);
 
-			ObjectDepot.push(pWaterbomb);
+					ObjectDepot.push(pWaterbomb);
+					nowcount++;
 
-			bomb_dt = 0;
+					bomb_dt = 0;
+				}
+
+				bomb_dt += tick;
+			}
 		}
-		bomb_dt += tick;
-	}
 
-	// Move
+		// Move
 
-	if ((::GetAsyncKeyState(key_up) & 0x8000) == 0x8000)
-	{
-		if (pos().y > clientrc.top + size)
+		if ((::GetAsyncKeyState(key_up) & 0x8000) == 0x8000)
 		{
-			direction = Vector(0.f,-speed);
-			pos() = pos() + direction;
+			if (pos().y > clientrc.top + size)
+			{
+				direction = Vector(0.f,-speed);
+				pos() = pos() + direction;
+			}
 		}
-	}
-	else if ((::GetAsyncKeyState(key_down) & 0x8000) == 0x8000)
-	{
-		if (pos().y < clientrc.bottom - size)
+		else if ((::GetAsyncKeyState(key_down) & 0x8000) == 0x8000)
 		{
-			direction = Vector(0.f,speed);
-			pos() = pos() + direction;
+			if (pos().y < clientrc.bottom - size)
+			{
+				direction = Vector(0.f,speed);
+				pos() = pos() + direction;
+			}
 		}
-	}
-	else if ((::GetAsyncKeyState(key_left) & 0x8000) == 0x8000)
-	{
-		if (pos().x > clientrc.left + size)
+		else if ((::GetAsyncKeyState(key_left) & 0x8000) == 0x8000)
 		{
-			direction = Vector(-speed,0.f);
-			pos() = pos() + direction;
+			if (pos().x > clientrc.left + size)
+			{
+				direction = Vector(-speed,0.f);
+				pos() = pos() + direction;
+			}
 		}
-	}
-	else if ((::GetAsyncKeyState(key_right) & 0x8000) == 0x8000)
-	{
-		if (pos().x < clientrc.right - size)
+		else if ((::GetAsyncKeyState(key_right) & 0x8000) == 0x8000)
 		{
-			direction = Vector(speed,0.f);
-			pos() = pos() + direction;
+			if (pos().x < clientrc.right - size)
+			{
+				direction = Vector(speed,0.f);
+				pos() = pos() + direction;
+			}
 		}
 	}
 
@@ -114,19 +123,46 @@ void Character::Draw(HDC hdc)
 
 bool Character::IsCollide(Object* obj)
 {
+	// ¹°¿¡ ¸ÂÀ½
    if (obj->type() == OBJ_WATER)
-   {
-      //Water* pWater = dynamic_cast<Water*>(obj);
-      //Point pt = pWater->GetPosition();
-		
+   {		
 	   Point pt = obj->GetPosition();
 	   
 	   return Collision(pos(), size, pt);
    }
-   //else if (obj->type() == OBJ_BLOCK)
-   //{
-   //   return obj->IsCollide(this);
-   //}
+	// ¾ÆÀÌÅÛ(°¹¼ö)À» È¹µæÇÔ
+   else if (obj->type() == OBJ_ITEM_COUNT)
+   {
+	  Point pt = obj->GetPosition();
+
+	  if (Collision(pos(), size, pt))
+	  {
+		  CountUp();
+		  return true;
+	  }
+   }
+	// ¾ÆÀÌÅÛ(ÆÄ¿ö)À» È¹µæÇÔ
+   else if (obj->type() == OBJ_ITEM_POWER)
+   {
+	  Point pt = obj->GetPosition();
+
+	  if (Collision(pos(), size, pt))
+	  {
+		  PowerUp();
+		  return true;
+	  }
+   }
+	// ¾ÆÀÌÅÛ(½ºÇÇµå)À» È¹µæÇÔ
+   else if (obj->type() == OBJ_ITEM_SPEED)
+   {
+	  Point pt = obj->GetPosition();
+
+	  if (Collision(pos(), size, pt))
+	  {
+		  SpeedUp();
+		  return true;
+	  }
+   }
 
    return false;
 }

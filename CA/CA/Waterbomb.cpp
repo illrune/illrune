@@ -48,10 +48,20 @@ void Waterbomb::Draw(HDC hdc)
 	::Select(hdc,hOldBrush);
 	::DeleteObject(hBrush);
 }
-
+void Waterbomb::SetPower(int WPower)
+{
+	power = WPower;
+}
 bool Waterbomb::IsCollide(Object* obj)
 {
 	// TODO
+	if (obj->type() == OBJ_WATER)
+	{
+		Point pt = obj->GetPosition();
+
+		return Collision(pos(), 10, pt);
+	}
+
 	return false;
 }
 

@@ -35,6 +35,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		
 		/////////////////////////////
 
+		for (int i = 0; i < 5; i++)
+		{
+			Box* pBox = new Box;
+			pBox->SetPosition(Point((rand()%10)*40 + 20, (rand()%10)*40 + 20));		
+			ObjectDepot.push(pBox);
+		}
+
 		st = ::GetTickCount();
 		::SetTimer(hWnd, 0, 10, NULL);
 		return 0;

@@ -2,6 +2,8 @@
 
 #include "GameDev.h"
 #include "Object.h"
+#include "Character.h"
+#include "Water.h"
 
 class Power : public Object
 {

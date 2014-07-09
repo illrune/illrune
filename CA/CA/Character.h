@@ -59,4 +59,5 @@ private :
 	float speed;
 	int count;
 	int power;
+	int nowcount;
 };

@@ -23,26 +23,36 @@ void ObjectManager::Input(DWORD tick)
 }
 void ObjectManager::Update(DWORD tick)
 {
-   std::set<Object*>::iterator it, jt;
-   for (it = depot.begin(); it != depot.end(); it++)
-   {
-      (*it)->Update(tick);
-   }
-   for (it = depot.begin(); it != depot.end(); it++)
-   {
-      for (jt = it, jt++; jt != depot.end(); jt++)
-      {
-         if ((*it)->IsCollide(*jt))
-         {
-            if ((*it)->IsBreakable())
-				(*it)->DoBreak();
-			if ((*jt)->IsBreakable())
-				(*jt)->DoBreak();
-         }
-      }
-   }
+	std::set<Object*>::iterator it, jt;
+	for (it = depot.begin(); it != depot.end(); it++)
+	{
+	  (*it)->Update(tick);
+	}
+	for (it = depot.begin(); it != depot.end(); it++)
+	{
+	  for (jt = it, jt++; jt != depot.end(); jt++)
+	  {
+		 if ((*it)->IsCollide(*jt))
+		 {
+			 if((*jt)->type() != OBJ_ITEM_SPEED &&
+				 (*jt)->type() != OBJ_ITEM_POWER &&
+				 (*jt)->type() != OBJ_ITEM_COUNT)
+			 {
+				if ((*it)->IsBreakable())
+					(*it)->DoBreak();
+			 }
+			 if((*it)->type() != OBJ_ITEM_SPEED &&
+				 (*it)->type() != OBJ_ITEM_POWER &&
+				 (*it)->type() != OBJ_ITEM_COUNT)
+			 {
+				if ((*jt)->IsBreakable())
+					(*jt)->DoBreak();
+			 }
+		 }
+	  }
+	}
 
-   _clean();
+	_clean();
 }
 void ObjectManager::Draw(HDC hdc)
 {

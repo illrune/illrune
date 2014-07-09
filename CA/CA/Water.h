@@ -2,6 +2,7 @@
 
 #include "GameDev.h"
 #include "Object.h"
+#include "Collision.h"
 
 class Water : public Object
 {

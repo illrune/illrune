@@ -12,7 +12,7 @@ private :
 
 public :
    // character to water;
-   bool operator ()(const Point& charpos, const LONG& size, const Point& waterpos);
+   bool operator ()(const Point& charpos, const LONG& size, const Point& objpos);
    //// rectangle to circle
    //bool operator ()(const Rect& rc, const Point& pt, const LONG& r);
    //// rectangle to rectangle

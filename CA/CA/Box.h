@@ -2,10 +2,15 @@
 
 #include "GameDev.h"
 #include "Object.h"
+#include "Collision.h"
+
+#include "Count.h"
+#include "Power.h"
+#include "Speed.h"
 
 class Box : public Object
 {
-protected :
+public :
 	Box();
 	virtual ~Box();
 

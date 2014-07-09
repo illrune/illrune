@@ -50,3 +50,12 @@ Point& Object::pos()
 {
    return m_ptPos;
 }
+void Object::SpeedUp()
+{
+}
+void Object::CountUp()
+{
+}
+void Object::PowerUp()
+{
+}

@@ -9,9 +9,9 @@ CollisionImpl::~CollisionImpl()
 }
 
 // character to water;
-bool CollisionImpl::operator ()(const Point& charpos, const LONG& size, const Point& waterpos)
+bool CollisionImpl::operator ()(const Point& charpos, const LONG& size, const Point& objpos)
 {
-   if (sqrt(float(charpos ^ waterpos)) <= size)
+   if (sqrt(float(charpos ^ objpos)) < size + size/2)
       return true;
 
    return false;

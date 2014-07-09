@@ -9,5 +9,6 @@
 #include <sstream> // wostringstream
 #include "GameDev.h"
 #include "Character.h"
+#include "Box.h"
 
 LRESULT CALLBACK WndProc(HWND,UINT,WPARAM,LPARAM);

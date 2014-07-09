@@ -45,6 +45,10 @@ public :
    bool IsNeedToClean() const;
    void SetNeedToClean();
 
+	virtual void SpeedUp();
+	virtual void CountUp();
+	virtual void PowerUp();
+
 protected :
    Point& pos();
 
