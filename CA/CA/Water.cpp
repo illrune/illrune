@@ -34,17 +34,23 @@ void Water::Draw(HDC hdc)
 bool Water::IsCollide(Object* obj)
 {
 	// TODO
-	if (obj->type() == OBJ_WATERBOMB)
-	{
-		Point pt = obj->GetPosition();
-
-		return Collision(pos(), 10, pt);
+	if (obj->type() == OBJ_CHARACTER)
+	{		
+	   Point pt = obj->GetPosition();
+	   
+	   return Collision(pos(), 20, pt);
 	}
 	else if (obj->type() == OBJ_BOX)
 	{
 		Point pt = obj->GetPosition();
 
-		return Collision(pos(), 10, pt);
+		return Collision(pos(), 20, pt);
+	}
+	else if (obj->type() == OBJ_WATERBOMB)
+	{
+		Point pt = obj->GetPosition();
+
+		return Collision(pos(), 20, pt);
 	}
 
 	return false;

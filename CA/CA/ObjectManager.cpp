@@ -34,19 +34,26 @@ void ObjectManager::Update(DWORD tick)
 	  {
 		 if ((*it)->IsCollide(*jt))
 		 {
-			 if((*jt)->type() != OBJ_ITEM_SPEED &&
+			 if ((*jt)->type() != OBJ_ITEM_SPEED &&
 				 (*jt)->type() != OBJ_ITEM_POWER &&
 				 (*jt)->type() != OBJ_ITEM_COUNT)
 			 {
-				if ((*it)->IsBreakable())
-					(*it)->DoBreak();
+				 if((*it)->type() != OBJ_WATER)
+				 {
+					if ((*it)->IsBreakable())
+						(*it)->DoBreak();
+				 }
 			 }
-			 if((*it)->type() != OBJ_ITEM_SPEED &&
+
+			 if ((*it)->type() != OBJ_ITEM_SPEED &&
 				 (*it)->type() != OBJ_ITEM_POWER &&
 				 (*it)->type() != OBJ_ITEM_COUNT)
 			 {
-				if ((*jt)->IsBreakable())
-					(*jt)->DoBreak();
+				 if ((*jt)->type() != OBJ_WATER)
+				 {
+					if ((*jt)->IsBreakable())
+						(*jt)->DoBreak();
+				 }
 			 }
 		 }
 	  }

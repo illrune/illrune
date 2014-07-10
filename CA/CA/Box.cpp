@@ -31,44 +31,48 @@ bool Box::IsCollide(Object* obj)
 	{
 		Point pt = obj->GetPosition();
 
-		return Collision(pos(), 10, pt);
+		return Collision(pos(), 20, pt);
 	}
 	return false;
 }
 
 void Box::DoBreak()
 {
-	// 상자가 부서진 후 5분의 1 확률로 아이템이 생성
-
-	// 갯수 아이템 생성
-	if (rand()%5 == 0)
+	if (!IsNeedToClean())
 	{
-		Count* pCount= new Count;
+		int BoxItem = rand()%5;
+		// 상자가 부서진 후 5분의 1 확률로 아이템이 생성
 
-		pCount->SetObjectPosition(pos());
+		// 갯수 아이템 생성
+		if (BoxItem == 0)
+		{
+			Count* pCount= new Count;
 
-		ObjectDepot.push(pCount);
+			pCount->SetObjectPosition(pos());
+
+			ObjectDepot.push(pCount);
+		}
+		// 파워 아이템 생성
+		else if (BoxItem == 1)
+		{
+			Power* pPower= new Power;
+
+			pPower->SetObjectPosition(pos());
+
+			ObjectDepot.push(pPower);
+		}
+		// 스피드 아이템 생성
+		else if (BoxItem == 2)
+		{
+			Speed* pSpeed= new Speed;
+
+			pSpeed->SetObjectPosition(pos());
+
+			ObjectDepot.push(pSpeed);
+		}
+
+		// 그 외에는 빈 상자
+
+		SetNeedToClean();
 	}
-	// 파워 아이템 생성
-	else if (rand()%5 == 1)
-	{
-		Power* pPower= new Power;
-
-		pPower->SetObjectPosition(pos());
-
-		ObjectDepot.push(pPower);
-	}
-	// 스피드 아이템 생성
-	else if (rand()%5 == 2)
-	{
-		Speed* pSpeed= new Speed;
-
-		pSpeed->SetObjectPosition(pos());
-
-		ObjectDepot.push(pSpeed);
-	}
-
-	// 그 외에는 빈 상자
-
-	SetNeedToClean();
 }

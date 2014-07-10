@@ -28,13 +28,13 @@ void Count::Draw(HDC hdc)
 bool Count::IsCollide(Object* obj)
 {
 	// TODO
-	if (obj->type() == OBJ_WATER)
-	{
-		Point pt = obj->GetPosition();
+	//if (obj->type() == OBJ_WATER)
+	//{
+	//	Point pt = obj->GetPosition();
 
-		return Collision(pos(), 20, pt);
-	}
-	else if (obj->type() == OBJ_CHARACTER)
+	//	return Collision(pos(), 20, pt);
+	//}
+	if (obj->type() == OBJ_CHARACTER)
 	{
 		Point pt = obj->GetPosition();
 

@@ -35,7 +35,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		
 		/////////////////////////////
 
-		for (int i = 0; i < 5; i++)
+		for (int i = 0; i < 10; i++)
 		{
 			Box* pBox = new Box;
 			pBox->SetPosition(Point((rand()%10)*40 + 20, (rand()%10)*40 + 20));		

@@ -54,12 +54,12 @@ void Waterbomb::SetPower(int WPower)
 }
 bool Waterbomb::IsCollide(Object* obj)
 {
-	// TODO
+	//TODO
 	if (obj->type() == OBJ_WATER)
 	{
 		Point pt = obj->GetPosition();
 
-		return Collision(pos(), 10, pt);
+		return Collision(pos(), 20, pt);
 	}
 
 	return false;
@@ -67,31 +67,34 @@ bool Waterbomb::IsCollide(Object* obj)
 
 void Waterbomb::DoBreak()
 {
-	Water* pWater= new Water;
-
-	pWater->SetObjectPosition(pos());
-
-	ObjectDepot.push(pWater);
-
-	for (int i = 0; i < power; i++)
+	if (!IsNeedToClean())
 	{
-		// UP
-		pWater = new Water;
-		pWater->SetObjectPosition(pos() + Point(0,-(40*(i+1))));
-		ObjectDepot.push(pWater);
-		// DOWN
-		pWater = new Water;
-		pWater->SetObjectPosition(pos() + Point(0,40*(i+1)));
-		ObjectDepot.push(pWater);
-		// LEFT
-		pWater = new Water;
-		pWater->SetObjectPosition(pos() + Point(-(40*(i+1)),0));
-		ObjectDepot.push(pWater);
-		// RIGHT
-		pWater = new Water;
-		pWater->SetObjectPosition(pos() + Point(40*(i+1),0));
-		ObjectDepot.push(pWater);
-	}
+		Water* pWater= new Water;
 
-	SetNeedToClean();
+		pWater->SetObjectPosition(pos());
+
+		ObjectDepot.push(pWater);
+
+		for (int i = 0; i < power; i++)
+		{
+			// UP
+			pWater = new Water;
+			pWater->SetObjectPosition(pos() + Point(0,-(40*(i+1))));
+			ObjectDepot.push(pWater);
+			// DOWN
+			pWater = new Water;
+			pWater->SetObjectPosition(pos() + Point(0,40*(i+1)));
+			ObjectDepot.push(pWater);
+			// LEFT
+			pWater = new Water;
+			pWater->SetObjectPosition(pos() + Point(-(40*(i+1)),0));
+			ObjectDepot.push(pWater);
+			// RIGHT
+			pWater = new Water;
+			pWater->SetObjectPosition(pos() + Point(40*(i+1),0));
+			ObjectDepot.push(pWater);
+		}
+
+		SetNeedToClean();
+	}
 }

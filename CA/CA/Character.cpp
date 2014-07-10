@@ -1,7 +1,7 @@
 #include "Character.h"
 
 Character::Character()
-: lock_dt(0), lock_delay(1000)
+: lock_dt(0), lock_delay(2000)
 , st(0), dt(0)
 , color(RGB(255,255,255)), colorvalue(0), size(20), locked(false)
 , bomb_dt(0), bomb_delay(200)
@@ -9,7 +9,7 @@ Character::Character()
 , key_up(VK_UP), key_down(VK_DOWN), key_left(VK_LEFT), key_right(VK_RIGHT)
 , Object(OBJ_CHARACTER, true)
 , direction(0.f,0.f)
-, speed(2.f), count(1), power(2), nowcount(0)
+, speed(2.f), count(30), power(2), nowcount(0)
 {
 	st = ::GetTickCount();
 }
@@ -23,8 +23,9 @@ void Character::Input(DWORD tick)
 	// item_use
 	if ((::GetAsyncKeyState(key_item_use) & 0x8000) == 0x8000)
 	{
-		lock_dt = 0;
+		color = RGB(255,255,255);
 		colorvalue = 0;
+		lock_dt = 0;
 		locked = false;
 	}
 	if (!locked)
@@ -90,14 +91,12 @@ void Character::Input(DWORD tick)
 	//::GetKeyState();
 	//::GetKeyboardState();
 }
-void Character::Update(DWORD)
+void Character::Update(DWORD tick)
 {
-	color = RGB(255-colorvalue, 255-colorvalue, 255-colorvalue);
-	dt = ::GetTickCount() - st;
-	st = ::GetTickCount();
-
 	if(locked)
 	{
+		color = RGB(255-colorvalue, 255-colorvalue, 255-colorvalue);
+
 		if (lock_dt >= lock_delay)
 		{
 			colorvalue++;
@@ -106,7 +105,7 @@ void Character::Update(DWORD)
 				SetNeedToClean();
 		}
 
-		lock_dt += dt;
+		lock_dt += tick;
 	}
 }
 void Character::Draw(HDC hdc)
@@ -130,45 +129,28 @@ bool Character::IsCollide(Object* obj)
 	   
 	   return Collision(pos(), size, pt);
    }
-	// ¾ÆÀÌÅÛ(°¹¼ö)À» È¹µæÇÔ
+	//¾ÆÀÌÅÛ(°¹¼ö)À» È¹µæÇÔ
    else if (obj->type() == OBJ_ITEM_COUNT)
    {
-	  Point pt = obj->GetPosition();
-
-	  if (Collision(pos(), size, pt))
-	  {
-		  CountUp();
-		  return true;
-	  }
+	   obj->IsCollide(this);
    }
-	// ¾ÆÀÌÅÛ(ÆÄ¿ö)À» È¹µæÇÔ
+	//¾ÆÀÌÅÛ(ÆÄ¿ö)À» È¹µæÇÔ
    else if (obj->type() == OBJ_ITEM_POWER)
    {
-	  Point pt = obj->GetPosition();
-
-	  if (Collision(pos(), size, pt))
-	  {
-		  PowerUp();
-		  return true;
-	  }
+	   obj->IsCollide(this);
    }
-	// ¾ÆÀÌÅÛ(½ºÇÇµå)À» È¹µæÇÔ
+	//¾ÆÀÌÅÛ(½ºÇÇµå)À» È¹µæÇÔ
    else if (obj->type() == OBJ_ITEM_SPEED)
    {
-	  Point pt = obj->GetPosition();
-
-	  if (Collision(pos(), size, pt))
-	  {
-		  SpeedUp();
-		  return true;
-	  }
+	   obj->IsCollide(this);
    }
 
    return false;
 }
 void Character::DoBreak()
 {
-	locked = true;
+	if (!locked)
+		locked = true;
 }
 void Character::SetClientRect(Rect& rc)
 {
@@ -190,7 +172,7 @@ void Character::SetKeyMapping(const int& item_use,
 }
 void Character::SpeedUp()
 {
-	speed += 0.5f;
+	speed += 1.f;
 }
 void Character::CountUp()
 {
