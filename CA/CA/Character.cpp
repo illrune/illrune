@@ -3,7 +3,7 @@
 Character::Character()
 : lock_dt(0), lock_delay(2000)
 , st(0), dt(0)
-, color(RGB(255,255,255)), colorvalue(0), size(20), locked(false)
+, color(RGB(255,255,255)), colorvalue(0), size(20), locked(false), moveable(true)
 , bomb_dt(0), bomb_delay(200)
 , key_allocate(VK_SPACE), key_item_use(VK_LCONTROL)
 , key_up(VK_UP), key_down(VK_DOWN), key_left(VK_LEFT), key_right(VK_RIGHT)
@@ -28,7 +28,7 @@ void Character::Input(DWORD tick)
 		lock_dt = 0;
 		locked = false;
 	}
-	if (!locked)
+	if (!locked) // °¤Èù »óÅÂ°¡ ¾Æ´Ò¶§¸¸ Á¶ÀÛ°¡´É
 	{
 		// allocate
 		if ((::GetAsyncKeyState(key_allocate) & 0x8000) == 0x8000)

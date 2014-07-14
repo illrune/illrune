@@ -81,14 +81,23 @@ void Waterbomb::DoBreak()
 			pWater = new Water;
 			pWater->SetObjectPosition(pos() + Point(0,-(40*(i+1))));
 			ObjectDepot.push(pWater);
+		}
+		for (int i = 0; i < power; i++)
+		{
 			// DOWN
 			pWater = new Water;
 			pWater->SetObjectPosition(pos() + Point(0,40*(i+1)));
 			ObjectDepot.push(pWater);
+		}
+		for (int i = 0; i < power; i++)
+		{
 			// LEFT
 			pWater = new Water;
 			pWater->SetObjectPosition(pos() + Point(-(40*(i+1)),0));
 			ObjectDepot.push(pWater);
+		}
+		for (int i = 0; i < power; i++)
+		{
 			// RIGHT
 			pWater = new Water;
 			pWater->SetObjectPosition(pos() + Point(40*(i+1),0));

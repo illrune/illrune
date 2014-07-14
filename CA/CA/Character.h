@@ -32,6 +32,8 @@ public :
 	void CountUp();
 	void PowerUp();
 
+	void CanNotMove();
+
 private :
 	DWORD st;
 	DWORD dt;
@@ -42,6 +44,7 @@ private :
 	int colorvalue;
 	int size;
 	bool locked;
+	bool moveable;
 
 	Rect clientrc;
 	int bomb_dt;
