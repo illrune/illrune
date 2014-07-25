@@ -1,28 +1,25 @@
 #include <iostream>
 #include <conio.h>
-#include <string>
-#include <list>
 
 #include <windows.h>
+#include <tchar.h>
 #include <process.h>
+#include <fstream>
+#include <list>
 
 using namespace std;
 
-struct UserInfo
+struct Division
 {
-	std::string name;
-	int time;
+	int s;
+	int e;
 
-	friend std::ostream& operator << (std::ostream& os, const UserInfo& obj)
-	{
-		os << obj.name << endl;
+	int pcount;
 
-		return os;
-	}
-	friend std::istream& operator >> (std::istream& is, UserInfo& obj)
+	friend std::istream& operator >> (std::istream& is, Division& obj)
 	{
-		is >> obj.name;
-		is >> obj.time;
+		is >> obj.s;
+		is >> obj.e;
 
 		return is;
 	}
@@ -33,55 +30,88 @@ struct ThreadInfo
 	unsigned uId;
 };
 
-unsigned __stdcall foo(void* arg)
+bool IsPrime(int n)
 {
-	DWORD tick = ::GetTickCount();
+	if (n == 1)
+		return false;
 
-	UserInfo* Info = (UserInfo*)arg;
-
-	cout << "foo called : " << Info->name << endl;
-
-	while(::GetTickCount() - tick < unsigned(Info->time))
+	for (int i = 2; i <= n/2; i++)
 	{
+		if (n%i == 0)
+			return false;
 	}
 
-	cout << "end thread : " << Info->name << endl;
+	return true;
+}
+
+int Prime(int s, int e)
+{
+	int primecount = 0;
+	fstream file;
+	DWORD tick = ::GetTickCount();
+
+	list<int> primelist;
+
+	for (int i = s; i <= e; i++)
+	{
+		if(IsPrime(i))
+		{
+			primecount++;
+			primelist.push_back(i);
+		}
+	}
+
+	file.open("prime.p", ios_base::out);
+
+	list<int>::iterator it;
+
+	for (it = primelist.begin(); it != primelist.end(); it++)
+	{
+		file.write((char*)*it, sizeof(int));
+	}
+
+	file.close();
+
+	cout << "[ " << "prime count : " << primecount << " ]" << endl;
+	cout << "[ " << ::GetTickCount() - tick << " ms." << " ]" << endl;
+
+	return primecount;
+}
+
+unsigned __stdcall PrimeThread(void* arg)
+{
+	Division* saen = (Division*)arg;
+	saen->pcount = Prime(saen->s, saen->e);	
 
 	return 0;
 }
 
-void bar()
+void Thread()
 {
 	int count;
+	int total = 0;
 
 	cout << "몇 개? :";
 	cin >> count;
 
-	list<UserInfo*> userlist;				
+	list<Division*> divilist;
 
 	for(int i = 0; i < count; i++)
 	{
-		UserInfo* info = new UserInfo;
-		cin >> *info;
-		userlist.push_back(info);
+		Division* divi = new Division;
+		cin >> *divi;
+		divilist.push_back(divi);
 	}
 
 	list<ThreadInfo*> threadlist;
 	for(int i = 0; i < count; i++)
 	{
-		list<UserInfo*>::iterator it = userlist.begin();
+		list<Division*>::iterator it = divilist.begin();
 		advance(it, i);
 
 		ThreadInfo* info = new ThreadInfo;
-		info->hThread = (HANDLE)::_beginthreadex(NULL,0,&foo,(void*)*it,0,&(info->uId));
+		info->hThread = (HANDLE)::_beginthreadex(NULL,0,&PrimeThread,(void*)*it,0,&(info->uId));
 		threadlist.push_back(info);
-	}
-	
-	list<ThreadInfo*>::iterator tt;
-	int i = 0;
-	for(tt = threadlist.begin(); tt != threadlist.end(); tt++, i++)
-	{
-		cout << i << "/'s thread : " << (*tt)->hThread << endl;
 	}
 
 	int remain = count;
@@ -105,12 +135,15 @@ void bar()
 		}
 
 		// delete userlist element.
-		list<UserInfo*>::iterator ut = userlist.begin();
+		list<Division*>::iterator ut = divilist.begin();
 		advance(ut, index);
 
-		cout << "delete userinfo ..." << (*ut)->name << endl;
+		cout << "delete userinfo ... " << (*ut)->s << '~' << (*ut)->e << endl;
+		
+		total += (*ut)->pcount;
+
 		delete *ut;
-		userlist.erase(ut);
+		divilist.erase(ut);
 
 		// delete threadlist element.
 		tt = threadlist.begin();
@@ -126,11 +159,13 @@ void bar()
 	}
 
 	cout << "end job." << endl;
+	cout << "total count : " << total << endl;
 }
-
 int main(void)
-{	
-	bar();
+{
+	Thread();
+
+	// 이야 내가 해냈다
 
 	_getch();
 	return 0;
