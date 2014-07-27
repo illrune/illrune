@@ -64,10 +64,18 @@ int Prime(int s, int e)
 	file.open("prime.p", ios_base::out);
 
 	list<int>::iterator it;
+	int enter = 0;
 
 	for (it = primelist.begin(); it != primelist.end(); it++)
 	{
-		file.write((char*)*it, sizeof(int));
+		file << *it << ' ';
+		enter++;
+		
+		if(enter >= 10)
+		{
+			file << endl;
+			enter = 0;
+		}
 	}
 
 	file.close();
