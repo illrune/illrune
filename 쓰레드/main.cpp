@@ -5,12 +5,14 @@
 
 #include <windows.h>
 #include <tchar.h>
+#include <sstream>
 
 enum keycode_id
 {
 	SPECIAL = 0xE0,
 	UP		= 0x48,
 	DOWN	= 0x50,
+	ENTER	= 0x0D,
 };
 
 int main(void)
@@ -26,10 +28,14 @@ int main(void)
 	while(true)
 	{
 		int current = 0;
+		std::ostringstream oss;		
 
 		do {
 			if (index == current)
+			{
 				std::wcout << ">> ";
+				oss << "D:\\" << fd.cFileName << "\\*";
+			}
 			else
 				std::wcout << "   ";
 
@@ -67,6 +73,10 @@ int main(void)
 						if (index < current-1)
 							index++;
 					}
+				}
+				else if (key == ENTER)
+				{
+					// todo
 				}
 			}
 
