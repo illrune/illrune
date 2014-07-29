@@ -20,22 +20,21 @@ int main(void)
 	::setlocale(LC_ALL, "korean");
 
 	WIN32_FIND_DATA fd;
+	std::wostringstream wos, wos2;
+	wos2 << "D:";
+	wos << _T("" << wos2.str().c_str() << "\\*");
 
-	int index = 1;
+	int index = 0;
 
-	HANDLE hFile = ::FindFirstFile(_T("D:\\*"), &fd);
+	HANDLE hFile = ::FindFirstFile(wos.str().c_str(), &fd);
 
 	while(true)
 	{
-		int current = 0;
-		std::ostringstream oss;		
+		int current = 0;	
 
 		do {
 			if (index == current)
-			{
 				std::wcout << ">> ";
-				oss << "D:\\" << fd.cFileName << "\\*";
-			}
 			else
 				std::wcout << "   ";
 
@@ -53,7 +52,7 @@ int main(void)
 
 		} while (::FindNextFile(hFile,&fd));
 
-		hFile = ::FindFirstFile(_T("D:\\*"), &fd);
+		hFile = ::FindFirstFile(wos.str().c_str(), &fd);
 
 			if (_kbhit())
 			{
@@ -77,6 +76,25 @@ int main(void)
 				else if (key == ENTER)
 				{
 					// todo
+					for(int i = 0; i < index; i++)
+						::FindNextFile(hFile,&fd);
+
+					if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+					{
+						wos2 << "\\" << fd.cFileName;
+
+						std::wostringstream wostmp;
+						wostmp << _T("" << wos2.str().c_str() << "\\*");
+
+						wos.clear();
+						wos.str(_T(""));
+
+						wos << wostmp.str().c_str();
+						hFile = ::FindFirstFile(wos.str().c_str(), &fd);
+						index = 0;
+					}
+					else
+						hFile = ::FindFirstFile(wos.str().c_str(), &fd);
 				}
 			}
 
