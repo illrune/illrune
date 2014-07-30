@@ -31,7 +31,10 @@ public :
 
 	void up();
 	void down();
+	void mouse(int y);
 	void enter();
+
+	int GetSize();
 
 	friend FILEEXAPI std::wostream& operator << (std::wostream& os, const FileEx& obj);
 	friend FILEEXAPI HDC& operator << (HDC& dc, const FileEx& obj);

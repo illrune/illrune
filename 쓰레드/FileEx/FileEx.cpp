@@ -21,6 +21,14 @@ void FileEx::down()
 {
 	index = min(filelist.size()-1,index+1);
 }
+void FileEx::mouse(int y)
+{
+	index = y/25;
+}
+int FileEx::GetSize()
+{
+	return filelist.size();
+}
 void FileEx::enter()
 {
 	std::list<std::wstring>::iterator it = filelist.begin();
@@ -70,10 +78,26 @@ void FileEx::listdirectory()
 	WIN32_FIND_DATA fd;
 	std::wstring ret(path);
 	ret += _T("\\*");
+	//HANDLE hFile = ::FindFirstFile(ret.c_str(),&fd);
+	//do{
+	//	filelist.push_back(fd.cFileName);
+	//} while (::FindNextFile(hFile,&fd));
+
+	////
+
 	HANDLE hFile = ::FindFirstFile(ret.c_str(),&fd);
 	do{
-		filelist.push_back(fd.cFileName);
+		if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+			filelist.push_back(fd.cFileName);
 	} while (::FindNextFile(hFile,&fd));
+
+	hFile = ::FindFirstFile(ret.c_str(),&fd);
+	do{
+		if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
+			filelist.push_back(fd.cFileName);
+	} while (::FindNextFile(hFile,&fd));
+
+	////
 
 	::FindClose(hFile);
 }
@@ -106,7 +130,7 @@ HDC& operator << (HDC& dc, const FileEx& obj)
 		std::wostringstream oss;
 
 		if (i == obj.index)
-			oss << _T("<<");
+			oss << _T(">>");
 		else
 			oss << _T("  ");
 
