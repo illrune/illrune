@@ -22,6 +22,19 @@ enum keycode_id
 	ESC		= 0X1B,
 };
 
+struct FileInfo
+{
+	std::wstring name;
+	bool bDirectory;
+
+	FileInfo();
+	FileInfo(const TCHAR* _name, bool bDir);
+
+	bool operator == (const std::wstring& o) const;
+	operator std::wstring () const;
+	friend std::wostream& operator << (std::wostream& os, const FileInfo& obj);
+};
+
 class FILEEXAPI FileEx
 {
 public :
@@ -34,6 +47,8 @@ public :
 	void mouse(int y);
 	void enter();
 
+	void setpos(POINT pt);
+
 	int GetSize();
 
 	friend FILEEXAPI std::wostream& operator << (std::wostream& os, const FileEx& obj);
@@ -43,6 +58,7 @@ private :
 	void listdirectory();
 private :
 	std::wstring path;
-	std::list<std::wstring> filelist;
+	std::list<FileInfo> filelist;
 	int index;
+	int lineheight;
 };

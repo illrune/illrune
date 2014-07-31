@@ -3,7 +3,6 @@
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	static FileEx fe(_T("D:"));
-	static Point ptMouse;
 
 	if (uMsg == WM_DESTROY)
 	{
@@ -43,34 +42,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		return 0;
 	}
-	else if (uMsg == WM_MOUSEMOVE)
+	else if (uMsg == WM_LBUTTONDOWN)
 	{
+		POINT ptMouse;
 		::GetCursorPos(&ptMouse);
-		ptMouse = ptMouse.ToClient(hWnd);
+		::ScreenToClient(hWnd, &ptMouse);
+
+		fe.setpos(ptMouse);
 
 		RECT rc;
 		::GetClientRect(hWnd,&rc);
-
-		if (ptMouse.x <= 500 && ptMouse.y < (fe.GetSize() * 25))
-		{
-			fe.mouse(ptMouse.y);
-		}
-
 		::InvalidateRect(hWnd,&rc,TRUE);
 
 		return 0;
 	}
-	else if (uMsg == WM_LBUTTONDOWN)
+	else if (uMsg == WM_LBUTTONDBLCLK)
 	{
+		fe.enter();
+	
 		RECT rc;
 		::GetClientRect(hWnd,&rc);
-
-		if (ptMouse.x <= 500 && ptMouse.y < (fe.GetSize() * 25))
-		{
-			fe.mouse(ptMouse.y);
-			fe.enter();
-		}
-
 		::InvalidateRect(hWnd,&rc,TRUE);
 
 		return 0;

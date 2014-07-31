@@ -1,11 +1,11 @@
 #include "FileEx.h"
 
 FileEx::FileEx()
- : index(0)
+ : index(0), lineheight(25)
 {
 }
 FileEx::FileEx(const TCHAR* dir)
- : index(0), path(dir)
+ : index(0), path(dir), lineheight(25)
 {
 	listdirectory();
 }
@@ -21,17 +21,16 @@ void FileEx::down()
 {
 	index = min(filelist.size()-1,index+1);
 }
-void FileEx::mouse(int y)
+void FileEx::setpos(POINT pt)
 {
-	index = y/25;
-}
-int FileEx::GetSize()
-{
-	return filelist.size();
+	if (pt.x <= 500 && pt.y < lineheight * (filelist.size()+1))
+	{
+		index = max(0, pt.y/lineheight-1);
+	}
 }
 void FileEx::enter()
 {
-	std::list<std::wstring>::iterator it = filelist.begin();
+	std::list<FileInfo>::iterator it = filelist.begin();
 	std::advance(it,index);
 
 	if (*it == std::wstring(_T(".")))
@@ -46,7 +45,7 @@ void FileEx::enter()
 	else
 	{
 		std::wstring check(path);
-		check += _T("\\") + *it;
+		check += _T("\\") + std::wstring(*it);
 
 		WIN32_FIND_DATA fd;
 		HANDLE hCheck = ::FindFirstFile(check.c_str(),&fd);
@@ -56,7 +55,7 @@ void FileEx::enter()
 		}
 		else if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 		{
-			path += _T("\\") + *it;
+			path += _T("\\") + std::wstring(*it);
 		}
 		else
 		{
@@ -78,33 +77,18 @@ void FileEx::listdirectory()
 	WIN32_FIND_DATA fd;
 	std::wstring ret(path);
 	ret += _T("\\*");
-	//HANDLE hFile = ::FindFirstFile(ret.c_str(),&fd);
-	//do{
-	//	filelist.push_back(fd.cFileName);
-	//} while (::FindNextFile(hFile,&fd));
-
-	////
-
 	HANDLE hFile = ::FindFirstFile(ret.c_str(),&fd);
 	do{
-		if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
-			filelist.push_back(fd.cFileName);
+		bool bDir = ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY);
+			filelist.push_back(FileInfo(fd.cFileName,bDir));
 	} while (::FindNextFile(hFile,&fd));
-
-	hFile = ::FindFirstFile(ret.c_str(),&fd);
-	do{
-		if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
-			filelist.push_back(fd.cFileName);
-	} while (::FindNextFile(hFile,&fd));
-
-	////
 
 	::FindClose(hFile);
 }
 
 std::wostream& operator << (std::wostream& os, const FileEx& obj)
 {
-	std::list<std::wstring>::const_iterator it;
+	std::list<FileInfo>::const_iterator it;
 	int i = 0;
 	for (it = obj.filelist.begin(); it != obj.filelist.end(); it++, i++)
 	{
@@ -122,9 +106,15 @@ HDC& operator << (HDC& dc, const FileEx& obj)
 {
 	::SetBkMode(dc, TRANSPARENT);
 
-	std::list<std::wstring>::const_iterator it;
+	std::list<FileInfo>::const_iterator it;
 	int i = 0;
-	RECT rc = {0,0,500,25};
+
+	RECT rc = {0,0,500,obj.lineheight};
+
+	::DrawText(dc,obj.path.c_str(), -1, &rc, DT_LEFT);
+
+	::OffsetRect(&rc, 0, obj.lineheight);
+	
 	for (it = obj.filelist.begin(); it != obj.filelist.end(); it++, i++)
 	{
 		std::wostringstream oss;
@@ -136,7 +126,13 @@ HDC& operator << (HDC& dc, const FileEx& obj)
 
 		oss << *it;
 
-		if (i%2 == 0)
+		if (i == obj.index)
+		{
+			::SetDCBrushColor(dc, RGB(30,220,20));
+			::FillRect(dc, &rc, (HBRUSH)::GetStockObject(DC_BRUSH));
+		}
+
+		else if (i%2 == 0)
 		{
 			::SetDCBrushColor(dc, RGB(200,200,255));
 			::FillRect(dc, &rc, (HBRUSH)::GetStockObject(DC_BRUSH));
@@ -149,7 +145,7 @@ HDC& operator << (HDC& dc, const FileEx& obj)
 
 		::DrawText(dc,oss.str().c_str(), -1, &rc, DT_LEFT);
 
-		::OffsetRect(&rc, 0, 25);
+		::OffsetRect(&rc, 0, obj.lineheight);
 	}
 
 	return dc;

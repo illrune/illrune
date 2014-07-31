@@ -12,7 +12,7 @@ INT WINAPI _tWinMain(HINSTANCE hInstance,
 	::memset(&wcex, 0, sizeof(wcex));
 
     wcex.cbSize = sizeof(wcex);
-    wcex.style = CS_VREDRAW | CS_HREDRAW;
+    wcex.style = CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS;
     wcex.lpfnWndProc = &WndProc;
     wcex.cbClsExtra = 0;
     wcex.cbWndExtra = 0;
@@ -29,26 +29,25 @@ INT WINAPI _tWinMain(HINSTANCE hInstance,
 		return 1;
 	}
 
-	int width = 1000;
-	int height = 600;
+	//int width = 1000;
+	//int height = 600;
 
-	int cx = ::GetSystemMetrics(SM_CXSCREEN);
-	int cy = ::GetSystemMetrics(SM_CYSCREEN);
+	//int cx = ::GetSystemMetrics(SM_CXSCREEN);
+	//int cy = ::GetSystemMetrics(SM_CYSCREEN);
 
-	int x = (cx - width)/2;
-	int y = (cy - height)/2;
+	//int x = (cx - width)/2;
+	//int y = (cy - height)/2;
 
-	DWORD dwStyle = WS_OVERLAPPEDWINDOW;
-	dwStyle &= ~WS_MAXIMIZEBOX;
-	dwStyle &= ~WS_THICKFRAME;
+	//DWORD dwStyle = WS_OVERLAPPEDWINDOW;
+	//dwStyle &= ~WS_MAXIMIZEBOX;
+	//dwStyle &= ~WS_THICKFRAME;
 	//dwStyle = dwStyle & ~WS_MINIMIZEBOX;
 	//dwStyle &= ~WS_SYSMENU;
 	//dwStyle &= ~WS_CAPTION;
 
 	HWND hWnd = ::CreateWindowEx(0, szClassName, _T("Win32 FileEx"),
-		dwStyle,
-		x, y,
-		width, height,
+		WS_OVERLAPPEDWINDOW,
+		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
 		NULL, NULL, hInstance, NULL);
 
 	if (hWnd == NULL)
