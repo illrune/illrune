@@ -6,12 +6,15 @@
 #define FILEEXAPI __declspec(dllimport)
 #endif
 
+#pragma warning(disable:4251)
+
 #include <windows.h>
 #include <tchar.h>
 #include <list>
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
 enum keycode_id
 {
@@ -35,6 +38,20 @@ struct FileInfo
 	friend std::wostream& operator << (std::wostream& os, const FileInfo& obj);
 };
 
+struct FontInfo
+{
+	LOGFONT lfont;
+	COLORREF color;
+
+	FontInfo();
+	~FontInfo();
+
+	bool IsLoad() const;
+	void SetLoad();
+private :
+	bool bLoad;
+};
+
 class FILEEXAPI FileEx
 {
 public :
@@ -44,12 +61,11 @@ public :
 
 	void up();
 	void down();
-	void mouse(int y);
 	void enter();
 
-	void setpos(POINT pt);
+	bool setpos(POINT pt);
 
-	int GetSize();
+	void SetFontInfo(const LOGFONT& lfont, const COLORREF& color);
 
 	friend FILEEXAPI std::wostream& operator << (std::wostream& os, const FileEx& obj);
 	friend FILEEXAPI HDC& operator << (HDC& dc, const FileEx& obj);
@@ -61,4 +77,6 @@ private :
 	std::list<FileInfo> filelist;
 	int index;
 	int lineheight;
+
+	FontInfo fontinfo;
 };

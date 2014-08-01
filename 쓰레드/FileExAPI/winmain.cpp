@@ -1,4 +1,5 @@
 ﻿#include "windefine.h"
+#include "resource.h"
 
 INT WINAPI _tWinMain(HINSTANCE hInstance,
 					 HINSTANCE hPrevInstance,
@@ -17,12 +18,12 @@ INT WINAPI _tWinMain(HINSTANCE hInstance,
     wcex.cbClsExtra = 0;
     wcex.cbWndExtra = 0;
     wcex.hInstance = hInstance;
-	wcex.hIcon = ::LoadIcon(NULL, IDI_APPLICATION);
+	wcex.hIcon = ::LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	wcex.hCursor = ::LoadCursor(NULL, IDC_ARROW);
 	wcex.hbrBackground = (HBRUSH)::GetStockObject(WHITE_BRUSH);
     wcex.lpszMenuName = NULL;
     wcex.lpszClassName = szClassName;
-	wcex.hIconSm = ::LoadIcon(NULL, IDI_APPLICATION);
+	wcex.hIconSm = wcex.hIcon;
 
 	if (!::RegisterClassEx(&wcex))
 	{

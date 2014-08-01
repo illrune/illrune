@@ -58,11 +58,37 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	else if (uMsg == WM_LBUTTONDBLCLK)
 	{
-		fe.enter();
+		POINT ptMouse;
+		::GetCursorPos(&ptMouse);
+		::ScreenToClient(hWnd, &ptMouse);
+
+		if (fe.setpos(ptMouse))
+			fe.enter();
 	
 		RECT rc;
 		::GetClientRect(hWnd,&rc);
 		::InvalidateRect(hWnd,&rc,TRUE);
+
+		return 0;
+	}
+	else if (uMsg == WM_RBUTTONDOWN)
+	{
+		LOGFONT lFont;
+
+		CHOOSEFONT chFont;
+		chFont.lStructSize = sizeof(CHOOSEFONT);
+		chFont.Flags = CF_EFFECTS;
+		chFont.hwndOwner = hWnd;
+		chFont.lpLogFont = &lFont;
+
+		if (::ChooseFont(&chFont))
+		{
+			fe.SetFontInfo(lFont, chFont.rgbColors);
+
+			RECT rc;
+			::GetClientRect(hWnd,&rc);
+			::InvalidateRect(hWnd,&rc,TRUE);
+		}
 
 		return 0;
 	}
