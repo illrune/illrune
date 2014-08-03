@@ -4,9 +4,22 @@ FontInfo::FontInfo()
 : bLoad(false)
 {
 	//::GetModuleFileName(			// MSDN보고 구현 숙제
-	std::fstream fontfile;
 
-	fontfile.open("Font.info", std::ios_base::in | std::ios_base::binary);
+	TCHAR mPath[_MAX_PATH];
+	::GetModuleFileName(NULL, mPath, _MAX_PATH);
+
+	std::fstream fontfile;
+	std::wstring loadpath;
+
+	for (int i = 0; i < _MAX_PATH; i++)
+	{
+		loadpath += *(mPath+i);
+	}
+
+	loadpath = loadpath.substr(0, loadpath.find_last_of(_T('\\')));
+	loadpath += _T("\\Font.info");
+
+	fontfile.open(loadpath.c_str(), std::ios_base::in | std::ios_base::binary);
 
 	if (!fontfile.good())
 		return;
@@ -22,9 +35,21 @@ FontInfo::~FontInfo()
 {
 	if (bLoad)
 	{
-		std::fstream fontfile;
+		TCHAR mPath[_MAX_PATH];
+		::GetModuleFileName(NULL, mPath, _MAX_PATH);
 
-		fontfile.open("Font.info", std::ios_base::out | std::ios_base::binary);
+		std::fstream fontfile;
+		std::wstring savepath;
+
+		for (int i = 0; i < _MAX_PATH; i++)
+		{
+			savepath += *(mPath+i);
+		}
+
+		savepath = savepath.substr(0, savepath.find_last_of(_T('\\')));
+		savepath += _T("\\Font.info");
+
+		fontfile.open(savepath.c_str(), std::ios_base::out | std::ios_base::binary);
 
 		fontfile.write((const char*)&lfont, sizeof(LOGFONT));
 		fontfile.write((const char*)&color, sizeof(COLORREF));
