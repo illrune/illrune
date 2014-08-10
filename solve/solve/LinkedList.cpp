@@ -12,6 +12,7 @@ Node::Node(const pointer& p, const pointer& n)
 ///////////////////////////////////////////
 
 cLinkedList_int::cLinkedList_int()
+: size(0)
 {
 	tail = new Node(NULL, NULL);
 	head = new Node(NULL, tail);
@@ -27,12 +28,61 @@ cLinkedList_int::~cLinkedList_int()
 		delete tmp;
 	}
 }
+void cLinkedList_int::insert_pos(const int& pos, const int& i)
+{
+	if(pos > abs(size))
+		std::cout << "over pos." << std::endl;
+
+	else
+	{
+		Node* current = head;
+
+		for (int j = 0; j < pos; j++)
+		{
+			current = current->next;
+		}
+
+		Node* node = new Node(i, current, current->next);
+		node->prev->next = node;
+		node->next->prev = node;
+
+		size++;
+	}
+}
+void cLinkedList_int::remove_pos(const int& pos)
+{
+	if(pos >= abs(size))
+		std::cout << "over pos." << std::endl;
+
+	else
+	{
+		Node* current = head;
+
+		for (int j = 0; j < pos; j++)
+		{
+			current = current->next;
+		}
+
+		if (current->next == tail)
+			std::cout << "empty." << std::endl;
+		else
+		{
+			current->prev->next = current->next;
+			current->next->prev = current->prev;
+
+			delete current;
+
+			size--;
+		}
+	}
+}
 
 void cLinkedList_int::insert_front(const int& i)
 {
 	Node* node = new Node(i, head, head->next);
 	node->prev->next = node;
 	node->next->prev = node;
+	size++;
 }
 void cLinkedList_int::remove_front()
 {
@@ -47,7 +97,10 @@ void cLinkedList_int::remove_front()
 		node->next->prev = node->prev;
 
 		delete node;
+
+		size--;
 	}
+
 }
 
 void cLinkedList_int::insert_back(const int& i)
@@ -55,6 +108,8 @@ void cLinkedList_int::insert_back(const int& i)
 	Node* node = new Node(i, tail->prev, tail);
 	node->prev->next = node;
 	node->next->prev = node;
+
+	size++;
 }
 void cLinkedList_int::remove_back()
 {
@@ -69,6 +124,8 @@ void cLinkedList_int::remove_back()
 		node->next->prev = node->prev;		
 
 		delete node;
+
+		size--;
 	}
 }
 

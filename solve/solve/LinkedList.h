@@ -21,6 +21,9 @@ public :
 	~cLinkedList_int();
 
 public :
+	void insert_pos(const int& pos, const int& );
+	void remove_pos(const int& pos);
+
 	void insert_front(const int& );
 	void remove_front();
 
@@ -38,4 +41,5 @@ public :
 private :
 	Node* head;
 	Node* tail;
+	unsigned int size;
 };
