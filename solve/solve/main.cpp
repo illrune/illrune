@@ -64,6 +64,9 @@ int main(void)
 	//cll.print_front();
 	//cll.print_back();
 
+	//cll.insert_pos(0,4);
+	//cll.print_front();
+
 	///////////////////////////////////////////////////////////
 
 	//cLStack cls;
