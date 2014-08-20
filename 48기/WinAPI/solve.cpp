@@ -3,6 +3,8 @@
 // ☆━─ 03-03-21, 헤더파일 써주자 seth. ─━☆
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #include <windows.h>			//윈도우 헤더파일을 인크루드
+#include <list>
+#include "LineOrRect.h"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -87,24 +89,193 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 {
 	PAINTSTRUCT			ps;
 	HDC					hdc;
-	char				szBuf[128] = "가오나시";
-	static int			number = 0;
+
+	static std::list<LineOrRect*> depot;
+
+	static RECT			rc;
+
+	static POINT		ptMouse = {0,0};
+	static POINT		pt1 = {0,0};
+	static POINT		pt2 = {0,0};
+
+	static COLORREF		clr[8];
+	static int			nClrSelect = 7;
+
+	static bool			bLeftClick = false;
+	static bool			bRightClick = false;
+
+	static const int	nRcSize = 80;
+	::GetClientRect(g_hWnd,&rc);
+
+	COLORREF clrtmp = RGB(0,0,0);
+	for (int i = 0; i < 8; i++)
+	{
+		if (i >= 5)
+		{
+			if (i == 5)
+				clrtmp -= 0xFF00;
+			else if (i == 6)
+			{
+				clrtmp -= 0xFF;
+			}
+			else
+				clrtmp = 0;
+		}
+		else if (i%2 == 0)
+			clrtmp += 0xFF;
+		else
+			clrtmp = clrtmp << 8;
+
+		clr[i] = clrtmp;
+	}
 
 	switch(iMessage)
 	{
 		case WM_PAINT:
-			if(number > 4)
-			{
-				number = 0;
-			}
 			hdc = BeginPaint(hWnd, &ps);
-			::TextOut(hdc, 100, 100, szBuf, number*2);
+
+			// 색 지정 영역 그리기
+			{
+				RECT rcclr = {rc.right - nRcSize, rc.top + nRcSize/2, rc.right, rcclr.top + nRcSize};				
+				for (int i = 0; i < 8; i++)
+				{
+					HBRUSH hBrush = ::CreateSolidBrush(clr[i]);
+					HBRUSH hOldBrush = (HBRUSH)::SelectObject(hdc,hBrush);
+
+					::Rectangle(hdc, rcclr.left, rcclr.top, rcclr.right, rcclr.bottom);
+
+					::SelectObject(hdc,hOldBrush);
+					::DeleteObject(hBrush);
+
+					rcclr.top = rcclr.top + nRcSize;
+					rcclr.bottom = rcclr.top + nRcSize;
+				}
+			}
+
+			// 리스트 안에 저장된 선과 사각형
+			{
+				std::list<LineOrRect*>::iterator it;
+				for (it = depot.begin(); it != depot.end(); it++)
+				{
+					(*it)->Draw(hdc);
+				}
+			}
+
+			{
+				// 선택한 색으로 지정
+				HBRUSH hBrush = ::CreateSolidBrush(clr[nClrSelect]);
+				HPEN hPen = ::CreatePen(PS_SOLID, 1, clr[nClrSelect]);
+				// 전의 색상을 저장
+				HBRUSH hOldBrush = (HBRUSH)::SelectObject(hdc, hBrush);
+				HPEN hOldPen = (HPEN)::SelectObject(hdc, hPen);
+
+				// 현재 그리는 중인 선
+				if (bLeftClick)
+				{
+					::MoveToEx(hdc, pt1.x, pt1.y, NULL);
+					::LineTo(hdc, ptMouse.x, ptMouse.y);
+				}
+				// 현재 그리는 중인 사각형
+				else if (bRightClick)
+				{
+					int left, top, right, bottom;
+
+					left = min(pt1.x, ptMouse.x);
+					top = min(pt1.y, ptMouse.y);
+					right = max(pt1.x, ptMouse.x);
+					bottom = max(pt1.y, ptMouse.y);
+
+					::Rectangle(hdc, left, top, right, bottom);
+				}
+
+				// 브러시 메모리 해제
+				::SelectObject(hdc,hOldBrush);
+				::SelectObject(hdc,hOldPen);
+				::DeleteObject(hBrush);
+				::DeleteObject(hPen);
+			}
+
 			EndPaint(hWnd, &ps);
 		break;
-		case WM_LBUTTONDOWN:
-			number++;
+		case WM_LBUTTONDOWN:	// 왼쪽클릭(선)
+			// 선 그리기
+			if (ptMouse.x < rc.right - nRcSize)
+			{
+				bLeftClick = true;
+				pt1 = ptMouse;
+			}
+			// 색 영역 선택
+			else
+			{	
+				if (ptMouse.y >= nRcSize/2 && ptMouse.y <= nRcSize*8 + nRcSize/2)
+					nClrSelect = (ptMouse.y - nRcSize/2)/nRcSize;
+			}
+		break;
+		case WM_LBUTTONUP:
+			// 색 선택 영역에서 클릭을 떼면 취소
+			if (ptMouse.x >= rc.right - nRcSize)
+			{
+				bLeftClick = false;
+				::InvalidateRect(g_hWnd, NULL, true);
+				break;
+			}
+
+			// 선 추가
+			pt2 = ptMouse;
+			{
+				LineOrRect* pline = new LineOrRect(pt1, pt2);
+				pline->SetType(Line);
+				pline->SetColor(clr[nClrSelect]);
+
+				depot.push_back(pline);
+			}
+			bLeftClick = false;
 			::InvalidateRect(g_hWnd, NULL, true);
-			break;
+		break;
+		case WM_RBUTTONDOWN:	// 오른쪽클릭(사각형)
+			// 색 선택 영역이 아닐때만
+			if (ptMouse.x < rc.right - nRcSize)
+			{
+				bRightClick = true;
+				pt1 = ptMouse;
+			}
+		break;
+		case WM_RBUTTONUP:
+			// 색 선택 영역에서 클릭을 떼면 취소
+			if (ptMouse.x >= rc.right - nRcSize)
+			{
+				bRightClick = false;
+				::InvalidateRect(g_hWnd, NULL, true);
+				break;
+			}
+
+			// 사각형 추가
+			pt2 = ptMouse;
+
+			POINT lefttop, rightbottom;
+
+			lefttop.x = min(pt1.x, pt2.x);
+			lefttop.y = min(pt1.y, pt2.y);
+			rightbottom.x = max(pt1.x, pt2.x);
+			rightbottom.y = max(pt1.y, pt2.y);
+
+			{
+				LineOrRect* pRect = new LineOrRect(lefttop, rightbottom);
+				pRect->SetType(Rect);
+				pRect->SetColor(clr[nClrSelect]);
+
+				depot.push_back(pRect);
+			}
+
+			bRightClick = false;
+			::InvalidateRect(g_hWnd, NULL, true);
+		break;
+		case WM_MOUSEMOVE:
+			::GetCursorPos(&ptMouse);
+			::ScreenToClient(g_hWnd, &ptMouse);
+
+			::InvalidateRect(g_hWnd, NULL, true);
+		break;
 		case WM_KEYDOWN:
 			switch(wParam)
 			{
@@ -114,6 +285,14 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 			}
 		break;
 		case WM_DESTROY:
+			{
+				std::list<LineOrRect*>::iterator it;
+				for (it = depot.begin(); it != depot.end(); )
+				{
+					delete *it;
+					it = depot.erase(it);
+				}
+			}
 			PostQuitMessage(0);
 		return 0;
 	}
