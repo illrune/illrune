@@ -90,6 +90,8 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 	char				szBuf[128] = "";
 	static int			nNumber = 0;
 
+	static const int	nAsciiValue = 0x20;
+
 	switch(iMessage)
 	{
 		case WM_PAINT:
@@ -99,7 +101,7 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 		case WM_LBUTTONDOWN:
 			::InvalidateRect(g_hWnd, NULL, true);
 			break;
-		case WM_KEYDOWN:
+		case WM_CHAR:
 			if (nNumber >= 127)
 				break;
 
@@ -108,13 +110,18 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 			nNumber++;
 
 			szBuf[nNumber] = wParam;
+
+			if(szBuf[nNumber] >= 'A' && szBuf[nNumber] <= 'Z')
+				szBuf[nNumber] = szBuf[nNumber] + nAsciiValue;
+			else if(szBuf[nNumber] >= 'a' && szBuf[nNumber] <= 'z')
+				szBuf[nNumber] = szBuf[nNumber] - nAsciiValue;				
 			
 			if (nNumber <= 64)
 				::TextOut(hdc, 100 + nNumber*10, 100, &szBuf[nNumber], 1);
 			else
 				::TextOut(hdc, 100 + nNumber*10 - 64*10, 100 + 30, &szBuf[nNumber], 1);
 
-			::InvalidateRect(hWnd, NULL, false);
+			::InvalidateRect(g_hWnd, NULL, false);
 			::ReleaseDC(g_hWnd,hdc);
 		break;
 		case WM_DESTROY:
