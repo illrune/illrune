@@ -5,6 +5,7 @@
 #include <windows.h>			//윈도우 헤더파일을 인크루드
 #include <list>
 #include "LineOrRect.h"
+#include "ColorArea.h"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -92,65 +93,31 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 
 	static std::list<LineOrRect*> depot;
 
-	static RECT			rc;
-
 	static POINT		ptMouse = {0,0};
 	static POINT		pt1 = {0,0};
 	static POINT		pt2 = {0,0};
 
-	static COLORREF		clr[8];
-	static int			nClrSelect = 7;
+	static ColorArea	ColorDepot;
+	static int			nClrSelect = 0;
 
 	static bool			bLeftClick = false;
 	static bool			bRightClick = false;
 
 	static const int	nRcSize = 80;
+
+	// 색 선택영역 초기설정
+	RECT rc;
 	::GetClientRect(g_hWnd,&rc);
-
-	COLORREF clrtmp = RGB(0,0,0);
-	for (int i = 0; i < 8; i++)
-	{
-		if (i >= 5)
-		{
-			if (i == 5)
-				clrtmp -= 0xFF00;
-			else if (i == 6)
-			{
-				clrtmp -= 0xFF;
-			}
-			else
-				clrtmp = 0;
-		}
-		else if (i%2 == 0)
-			clrtmp += 0xFF;
-		else
-			clrtmp = clrtmp << 8;
-
-		clr[i] = clrtmp;
-	}
+	ColorDepot.SetClientRect(rc);
+	ColorDepot.SetSize(nRcSize);
 
 	switch(iMessage)
 	{
 		case WM_PAINT:
 			hdc = BeginPaint(hWnd, &ps);
 
-			// 색 지정 영역 그리기
-			{
-				RECT rcclr = {rc.right - nRcSize, rc.top + nRcSize/2, rc.right, rcclr.top + nRcSize};				
-				for (int i = 0; i < 8; i++)
-				{
-					HBRUSH hBrush = ::CreateSolidBrush(clr[i]);
-					HBRUSH hOldBrush = (HBRUSH)::SelectObject(hdc,hBrush);
-
-					::Rectangle(hdc, rcclr.left, rcclr.top, rcclr.right, rcclr.bottom);
-
-					::SelectObject(hdc,hOldBrush);
-					::DeleteObject(hBrush);
-
-					rcclr.top = rcclr.top + nRcSize;
-					rcclr.bottom = rcclr.top + nRcSize;
-				}
-			}
+			// 색 선택영역 그리기
+			ColorDepot.Draw(hdc);
 
 			// 리스트 안에 저장된 선과 사각형
 			{
@@ -163,8 +130,8 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 
 			{
 				// 선택한 색으로 지정
-				HBRUSH hBrush = ::CreateSolidBrush(clr[nClrSelect]);
-				HPEN hPen = ::CreatePen(PS_SOLID, 1, clr[nClrSelect]);
+				HBRUSH hBrush = ::CreateSolidBrush(ColorDepot.GetColor(nClrSelect));
+				HPEN hPen = ::CreatePen(PS_SOLID, 1, ColorDepot.GetColor(nClrSelect));
 				// 전의 색상을 저장
 				HBRUSH hOldBrush = (HBRUSH)::SelectObject(hdc, hBrush);
 				HPEN hOldPen = (HPEN)::SelectObject(hdc, hPen);
@@ -208,7 +175,7 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 			else
 			{	
 				if (ptMouse.y >= nRcSize/2 && ptMouse.y <= nRcSize*8 + nRcSize/2)
-					nClrSelect = (ptMouse.y - nRcSize/2)/nRcSize;
+					nClrSelect = ColorDepot.GetColorNumber(ptMouse.y);
 			}
 		break;
 		case WM_LBUTTONUP:
@@ -225,7 +192,7 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 			{
 				LineOrRect* pline = new LineOrRect(pt1, pt2);
 				pline->SetType(Line);
-				pline->SetColor(clr[nClrSelect]);
+				pline->SetColor(ColorDepot.GetColor(nClrSelect));
 
 				depot.push_back(pline);
 			}
@@ -262,7 +229,7 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 			{
 				LineOrRect* pRect = new LineOrRect(lefttop, rightbottom);
 				pRect->SetType(Rect);
-				pRect->SetColor(clr[nClrSelect]);
+				pRect->SetColor(ColorDepot.GetColor(nClrSelect));
 
 				depot.push_back(pRect);
 			}

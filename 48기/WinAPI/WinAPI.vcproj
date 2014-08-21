@@ -171,19 +171,16 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\ColorArea.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\LineOrRect.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\solve.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter
@@ -191,6 +188,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\ColorArea.h"
+				>
+			</File>
 			<File
 				RelativePath=".\LineOrRect.h"
 				>

@@ -1,13 +1,13 @@
 #include "LineOrRect.h"
 
-LineOrRect::LineOrRect(const POINT ptStart, const POINT ptEnd)
+LineOrRect::LineOrRect(const POINT& ptStart, const POINT& ptEnd)
 : start(ptStart), end(ptEnd), color(0x00000000), type(Line)
 {
 }
 LineOrRect::~LineOrRect()
 {
 }
-void LineOrRect::SetColor(COLORREF clr)
+void LineOrRect::SetColor(const COLORREF& clr)
 {
 	color = clr;
 }
